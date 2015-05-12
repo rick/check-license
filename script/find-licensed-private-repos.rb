@@ -5,7 +5,7 @@ require "yaml"
 require "pp"
 
 def debugging?
-  ENV['debugging'] && ENV['debugging'] != ''
+  ENV['DEBUG'] && ENV['DEBUG'] != ''
 end
 
 
@@ -21,13 +21,11 @@ puts "Current octokit rate limit: #{client.rate_limit.inspect}"
 # Fetch private repositories for the organization
 private_repos = client.organization_repositories(organization, { :type => 'private', :per_page => 100 })
 
-if false # TODO take this out to work on the whole privrepos list
 last_response = client.last_response
 until last_response.rels[:next].nil?
   last_response = last_response.rels[:next].get
   private_repos.concat last_response.data
   puts "Fetched more repositories. Running total: #{private_repos.size}" if debugging?
-end
 end
 
 puts "Number of private repos: #{private_repos.size}" if debugging?
