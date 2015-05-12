@@ -52,7 +52,12 @@ private_repos.each do |repo|
   puts "Found commit [#{commit_sha}] with tree [#{tree_sha}]" if debugging?
   puts "Fetching file list for tree [#{tree_sha}]..." if debugging?
 
-  tree = client.tree(full_name, tree_sha)
+  begin
+    tree = client.tree(full_name, tree_sha)
+  rescue Octokit::NotFound => exception
+    puts "Warning: repository #{full_name} doesn't appear to have any files in its default branch (#{default_branch})!  Skipping..."
+    next
+  end
 
   if tree[:tree].any? { |blob| blob[:type] == 'blob' && %w(LICENSE COPYING).include?(blob[:path]) }
     puts "Private repository [#{full_name}] at https://github.com/#{full_name}/ DOES appear to have a potentially open-source license." if debugging?
