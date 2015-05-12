@@ -16,7 +16,7 @@ creds = YAML.load(File.read(File.expand_path('~/.github.yml')))
 access_token = creds["token"]
 
 client = Octokit::Client.new(:access_token => access_token)
-puts "Current octokit rate limit: #{client.rate_limit.inspect}"
+puts "Current octokit rate limit: #{client.rate_limit.inspect}" if debugging?
 
 # Fetch private repositories for the organization
 private_repos = client.organization_repositories(organization, { :type => 'private', :per_page => 100 })
@@ -38,7 +38,7 @@ private_repos.each do |repo|
   full_name = repo[:full_name]
   default_branch = repo[:default_branch]
 
-  puts "Looking for license information for repository [#{full_name}] on default branch [#{default_branch}]..." 
+  puts "Looking for license information for repository [#{full_name}] on default branch [#{default_branch}]..."
   begin
     branch = client.branch(repo[:full_name], default_branch)
   rescue Octokit::NotFound => exception
@@ -54,7 +54,7 @@ private_repos.each do |repo|
 
   tree = client.tree(full_name, tree_sha)
 
-  if tree[:tree].any? { |blob| blob[:type] == 'blob' && %w(LICENSE COPYING).include?(blob[:path]) } 
+  if tree[:tree].any? { |blob| blob[:type] == 'blob' && %w(LICENSE COPYING).include?(blob[:path]) }
     puts "Private repository [#{full_name}] at https://github.com/#{full_name}/ DOES appear to have a potentially open-source license." if debugging?
     licensed << full_name
   else
@@ -62,7 +62,7 @@ private_repos.each do |repo|
   end
 end
 
-puts "Private repositories which appear to have a license:\n"
+puts "\nPrivate repositories which appear to have a license:\n"
 
 if licensed.empty?
   puts "None."
