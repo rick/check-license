@@ -16,7 +16,7 @@ token: 1234567890feedfacedeadbeefcafe0987654321
  - Bundle, and run the script, providing the github account name for your org:
 
 ```
-$ bundle install --path vendor
+$ bundle install --path vendor/bundler
 $ bundle exec script/find-licensed-private-repos.rb your-org-name-here
 ```
 
